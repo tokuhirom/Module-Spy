@@ -5,10 +5,13 @@ use Test::More;
 use Module::Spy;
 use Scalar::Util qw(refaddr);
 
+$|++;
+
 {
     package X;
+    our $Y_CNT = 0;
     sub new { bless {}, shift }
-    sub y { 'yyy' }
+    sub y { $Y_CNT++; 'yyy' }
 }
 
 subtest 'Spy class method', sub {
@@ -25,10 +28,47 @@ subtest 'Spy class method', sub {
         my $spy = spy('X', 'y');
 
         # When call the method
-        X->y;
+        local $X::Y_CNT = 0;
+        is +X->y, undef;
 
         # Then, it's called.
         ok $spy->called;
+        # And, original method did not called.
+        is $X::Y_CNT, 0;
+    };
+
+    subtest 'Call through', sub {
+        # Given set spy
+        my $spy = spy('X', 'y')->call_through;
+
+        # Then, return value is original's
+        local $X::Y_CNT = 0;
+        is +X->y, 'yyy';
+
+        # Then, it's called.
+        ok $spy->called;
+        # And, original method was called.
+        is $X::Y_CNT, 1;
+    };
+
+    subtest 'Call fake', sub {
+        my $called;
+
+        # Given set spy
+        my $spy = spy('X', 'y')->call_fake(sub { $called++; 5963 });
+
+        # Then, return value is undef
+        local $X::Y_CNT = 0;
+        is +X->y(), 5963;
+
+        # Then, it's called.
+        ok $spy->called;
+
+        # Then, the coderef was called.
+        is $called, 1;
+
+        # And, original method did not called.
+        is $X::Y_CNT, 0;
     };
 
     subtest 'Restored', sub {
@@ -75,10 +115,73 @@ subtest 'Spy instance method', sub {
         my $spy = spy($obj, 'y');
 
         # When call the method
+        local $X::Y_CNT = 0;
+        is $obj->y, undef;
+
+        # Then, it's called.
+        ok $spy->called;
+
+        # And, original method did not called.
+        is $X::Y_CNT, 0;
+    };
+
+    subtest 'Call through', sub {
+        # Given object
+        my $obj = X->new;
+
+        # Given set spy
+        my $spy = spy($obj, 'y')->call_through;
+
+        # Then, return value is 'yyy'
+        local $X::Y_CNT = 0;
         is $obj->y, 'yyy';
 
         # Then, it's called.
         ok $spy->called;
+
+        # And, original method was called.
+        is $X::Y_CNT, 1;
+    };
+
+    subtest 'Call fake', sub {
+        # Given object
+        my $obj = X->new;
+
+        # Given set spy
+        my $called = 0;
+        my $spy = spy($obj, 'y')->call_fake(sub {
+            $called++; 4649;
+        });
+
+        # Then, return value is 'yyy'
+        local $X::Y_CNT = 0;
+        is $obj->y, 4649;
+
+        # Then, it's called.
+        ok $spy->called;
+        is $called, 1;
+
+        # And, original method was not called.
+        is $X::Y_CNT, 0;
+    };
+
+    subtest "It's restore methods after out scoped", sub {
+        # Given object
+        my $obj = X->new();
+
+        {
+            # When, set spy
+            my $spy = spy($obj, 'y');
+
+            # Then, it's spy-ed.
+            is $obj->y, undef;
+            # And, spy was called
+            ok $spy->called;
+        }
+
+        # When scoped out,
+        # Then, it's restored.
+        is +X->y, 'yyy';
     };
 
     subtest "It's not affected for another object", sub {

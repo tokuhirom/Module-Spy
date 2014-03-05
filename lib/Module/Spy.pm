@@ -30,6 +30,18 @@ sub called {
     $self->{spy}->called;
 }
 
+sub call_through {
+    my $self = shift;
+    $self->{spy}->call_through;
+    return $self;
+}
+
+sub call_fake {
+    my ($self, $code) = @_;
+    $self->{spy}->call_fake($code);
+    return $self;
+}
+
 sub returns {
     my $self = shift;
     $self->{spy}->returns(@_);
@@ -54,17 +66,50 @@ sub new {
     my $spy = Module::Spy::Sub->new($orig);
     $self->{spy} = $spy;
 
+    $self->{orig_class} = ref($stuff);
+
     {
         no strict 'refs';
         no warnings 'redefine';
 
-        my $klass = "Module::Spy::Singleton" . $SINGLETON_ID++;
-        unshift @{"${klass}::ISA"}, ref($stuff);
-        *{"${klass}::${method}"} = $spy;
-        bless $stuff, $klass; # rebless
+        $SINGLETON_ID++;
+        my $klass = "Module::Spy::Singleton::" . $SINGLETON_ID;
+        $self->{id} = $SINGLETON_ID;
+        $self->{anon_class} = $klass;
+        $self->{isa} = do { \@{"${klass}::ISA"} };
+        unshift @{$self->{isa}}, ref($stuff);
+     #  *{"${klass}::${method}"} = $spy;
+     #  bless $stuff, $klass; # rebless
     }
 
     return $self;
+}
+
+sub get_stash {
+    my $klass = shift;
+
+    my $pack = *main::;
+    foreach my $part (split /::/, $klass){
+        return undef unless $pack = $pack->{$part . '::'};
+    }
+    return *{$pack}{HASH};
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    # Restore the object's type.
+    if (ref($self->stuff) eq $self->{anon_class}) {
+        bless $self->stuff, $self->{orig_class};
+    }
+
+    @{$self->{isa}} = ();
+
+    my $original_stash = get_stash("Module::Spy::Singleton");
+    my $sclass_stashgv = delete $original_stash->{$self->{id} . '::'};
+    %{$sclass_stashgv} = ();
+
+    undef $self->{spy};
 }
 
 package Module::Spy::Class;
@@ -101,6 +146,8 @@ sub DESTROY {
     no strict 'refs';
     no warnings 'redefine';
     *{"${stuff}::${method}"} = $orig;
+
+    undef $self->{spy};
 }
 
 package Module::Spy::Sub;
@@ -109,25 +156,46 @@ use Scalar::Util qw(refaddr);
 # inside-out
 our %COUNTER;
 our %RETURNS;
+our %CALL_THROUGH;
+our %CALL_FAKE;
 
 sub new {
     my ($class, $orig) = @_;
 
     my $body;
-
     my $code = sub { goto $body };
-    $body = sub {
-        $COUNTER{refaddr($code)}++;
 
-        if (exists $RETURNS{refaddr($code)}) {
-            return $RETURNS{refaddr($code)};
+    my $code_addr = refaddr($code);
+    $body = sub {
+        $COUNTER{$code_addr}++;
+
+        if (my $fake = $CALL_FAKE{$code_addr}) {
+            goto $fake;
         }
 
-        goto $orig;
+        if (exists $RETURNS{$code_addr}) {
+            return $RETURNS{$code_addr};
+        }
+
+        if ($CALL_THROUGH{$code_addr}) {
+            goto $orig;
+        }
+
+        return;
     };
 
     my $self = bless $code, $class;
     return $self;
+}
+
+sub DESTROY {
+    my $self = shift;
+    my $code_addr = refaddr($self);
+
+    delete $COUNTER{$code_addr};
+    delete $RETURNS{$code_addr};
+    delete $CALL_FAKE{$code_addr};
+    delete $CALL_THROUGH{$code_addr};
 }
 
 sub called {
@@ -138,6 +206,16 @@ sub called {
 sub returns {
     my ($self, $value) = @_;
     $RETURNS{refaddr($self)} = $value;
+}
+
+sub call_through {
+    my $self = shift;
+    $CALL_THROUGH{refaddr($self)}++;
+}
+
+sub call_fake {
+    my ($self, $code) = @_;
+    $CALL_FAKE{refaddr($self)} = $code;
 }
 
 1;
@@ -174,6 +252,10 @@ Spy for object method
 =head1 DESCRIPTION
 
 Module::Spy is spy library for Perl5.
+
+=head1 STABILITY
+
+B<This module is under development. I will change API without notice.>
 
 =head1 FUNCTIONS
 
