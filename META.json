@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "Spy for Perl5",
    "author" : [
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],

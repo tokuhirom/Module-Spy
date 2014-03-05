@@ -148,15 +148,59 @@ __END__
 
 =head1 NAME
 
-Test::Spy - It's new $module
+Test::Spy - Spy for Perl5
 
 =head1 SYNOPSIS
 
+Spy for class method.
+
     use Test::Spy;
+
+    my $spy = spy('LWP::UserAgent', 'request');
+    $spy->returns(HTTP::Response->new(200));
+
+    my $res = LWP::UserAgent->new()->get('http://mixi.jp/');
+
+Spy for object method
+
+    use Test::Spy;
+
+    my $ua = LWP::UserAgent->new();
+    my $spy = spy($ua, 'request')->returns(HTTP::Response->new(200));
+
+    my $res = $ua->get('http://mixi.jp/');
+
+    ok $spy->called;
 
 =head1 DESCRIPTION
 
-Test::Spy is ...
+Test::Spy is spy library for Perl5.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item C<< my $spy = spy($class|$object, $method) >>
+
+Create new spy. Returns new Test::Spy::Class or Test::Spy::Object instance.
+
+=back
+
+=head1 Test::Spy::(Class|Object) methods
+
+=over 4
+
+=item C<< $spy->called() :Bool >>
+
+Returns true value if the method was called. False otherwise.
+
+=item C<< $spy->returns($value) : Test::Spy::Base >>
+
+Stub the method's return value as C<$value>.
+
+Returns C<<$spy>> itself for method chaining.
+
+=back
 
 =head1 LICENSE
 

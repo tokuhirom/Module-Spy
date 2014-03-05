@@ -1,14 +1,50 @@
 # NAME
 
-Test::Spy - It's new $module
+Test::Spy - Spy for Perl5
 
 # SYNOPSIS
 
+Spy for class method.
+
     use Test::Spy;
+
+    my $spy = spy('LWP::UserAgent', 'request');
+    $spy->returns(HTTP::Response->new(200));
+
+    my $res = LWP::UserAgent->new()->get('http://mixi.jp/');
+
+Spy for object method
+
+    use Test::Spy;
+
+    my $ua = LWP::UserAgent->new();
+    my $spy = spy($ua, 'request')->returns(HTTP::Response->new(200));
+
+    my $res = $ua->get('http://mixi.jp/');
+
+    ok $spy->called;
 
 # DESCRIPTION
 
-Test::Spy is ...
+Test::Spy is spy library for Perl5.
+
+# FUNCTIONS
+
+- `my $spy = spy($class|$object, $method)`
+
+    Create new spy. Returns new Test::Spy::Class or Test::Spy::Object instance.
+
+# Test::Spy::(Class|Object) methods
+
+- `$spy->called() :Bool`
+
+    Returns true value if the method was called. False otherwise.
+
+- `$spy->returns($value) : Test::Spy::Base`
+
+    Stub the method's return value as `$value`.
+
+    Returns `<$spy`\> itself for method chaining.
 
 # LICENSE
 
