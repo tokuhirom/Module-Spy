@@ -25,3 +25,8 @@ cover_db/
 MYMETA.*
 
 /Test-Spy-*
+/Module-Spy-*
+/.build
+/_build_params
+!Build/
+!META.json

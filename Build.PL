@@ -23,8 +23,8 @@ my %args = (
         'Module::Build' => 0.38,
     },
 
-    name            => 'Test-Spy',
-    module_name     => 'Test::Spy',
+    name            => 'Module-Spy',
+    module_name     => 'Module::Spy',
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],

@@ -1,12 +1,13 @@
+[![Build Status](https://travis-ci.org/tokuhirom/Test-Spy.png?branch=master)](https://travis-ci.org/tokuhirom/Test-Spy)
 # NAME
 
-Test::Spy - Spy for Perl5
+Module::Spy - Spy for Perl5
 
 # SYNOPSIS
 
 Spy for class method.
 
-    use Test::Spy;
+    use Module::Spy;
 
     my $spy = spy('LWP::UserAgent', 'request');
     $spy->returns(HTTP::Response->new(200));
@@ -15,7 +16,7 @@ Spy for class method.
 
 Spy for object method
 
-    use Test::Spy;
+    use Module::Spy;
 
     my $ua = LWP::UserAgent->new();
     my $spy = spy($ua, 'request')->returns(HTTP::Response->new(200));
@@ -26,21 +27,21 @@ Spy for object method
 
 # DESCRIPTION
 
-Test::Spy is spy library for Perl5.
+Module::Spy is spy library for Perl5.
 
 # FUNCTIONS
 
 - `my $spy = spy($class|$object, $method)`
 
-    Create new spy. Returns new Test::Spy::Class or Test::Spy::Object instance.
+    Create new spy. Returns new Module::Spy::Class or Module::Spy::Object instance.
 
-# Test::Spy::(Class|Object) methods
+# Module::Spy::(Class|Object) methods
 
 - `$spy->called() :Bool`
 
     Returns true value if the method was called. False otherwise.
 
-- `$spy->returns($value) : Test::Spy::Base`
+- `$spy->returns($value) : Module::Spy::Base`
 
     Stub the method's return value as `$value`.
 

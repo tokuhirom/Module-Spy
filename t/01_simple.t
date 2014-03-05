@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
-use Test::Spy;
+use Module::Spy;
 use Scalar::Util qw(refaddr);
 
 {
@@ -92,7 +92,7 @@ subtest 'Spy instance method', sub {
         my $spy = spy($obj, 'y');
 
         # Then, $obj was spyed
-        is ref($obj->can('y')), 'Test::Spy::Sub';
+        is ref($obj->can('y')), 'Module::Spy::Sub';
 
         # Then, but $another_obj was *not* spyed
         is ref($another_obj->can('y')), 'CODE';

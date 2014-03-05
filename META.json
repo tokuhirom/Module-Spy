@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Test-Spy",
+   "name" : "Module-Spy",
    "no_index" : {
       "directory" : [
          "t",
@@ -53,5 +53,16 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Test-Spy/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Test-Spy",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tokuhirom/Test-Spy.git",
+         "web" : "https://github.com/tokuhirom/Test-Spy"
+      }
+   },
    "version" : "0.01"
 }

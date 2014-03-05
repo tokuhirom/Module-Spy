@@ -1,4 +1,4 @@
-package Test::Spy;
+package Module::Spy;
 use 5.008005;
 use strict;
 use warnings;
@@ -15,13 +15,13 @@ sub spy {
     my ($stuff, $method) = @_;
 
     if (Scalar::Util::blessed($stuff)) {
-        Test::Spy::Object->new($stuff, $method);
+        Module::Spy::Object->new($stuff, $method);
     } else {
-        Test::Spy::Class->new($stuff, $method);
+        Module::Spy::Class->new($stuff, $method);
     }
 }
 
-package Test::Spy::Base;
+package Module::Spy::Base;
 
 sub stuff { shift->{stuff} }
 sub method { shift->{method} }
@@ -37,8 +37,8 @@ sub returns {
     return $self;
 }
 
-package Test::Spy::Object;
-our @ISA=('Test::Spy::Base');
+package Module::Spy::Object;
+our @ISA=('Module::Spy::Base');
 
 my $SINGLETON_ID = 0;
 
@@ -52,14 +52,14 @@ sub new {
         or die "Missing $method";
     $self->{orig} = $orig;
 
-    my $spy = Test::Spy::Sub->new($orig);
+    my $spy = Module::Spy::Sub->new($orig);
     $self->{spy} = $spy;
 
     {
         no strict 'refs';
         no warnings 'redefine';
 
-        my $klass = "Test::Spy::Singleton" . $SINGLETON_ID++;
+        my $klass = "Module::Spy::Singleton" . $SINGLETON_ID++;
         unshift @{"${klass}::ISA"}, ref($stuff);
         *{"${klass}::${method}"} = $spy;
         bless $stuff, $klass; # rebless
@@ -68,8 +68,8 @@ sub new {
     return $self;
 }
 
-package Test::Spy::Class;
-our @ISA=('Test::Spy::Base');
+package Module::Spy::Class;
+our @ISA=('Module::Spy::Base');
 
 sub new {
     my $class = shift;
@@ -81,7 +81,7 @@ sub new {
         or die "Missing $method";
     $self->{orig} = $orig;
 
-    my $spy = Test::Spy::Sub->new($orig);
+    my $spy = Module::Spy::Sub->new($orig);
     $self->{spy} = $spy;
 
     {
@@ -104,7 +104,7 @@ sub DESTROY {
     *{"${stuff}::${method}"} = $orig;
 }
 
-package Test::Spy::Sub;
+package Module::Spy::Sub;
 use Scalar::Util qw(refaddr);
 
 # inside-out
@@ -148,13 +148,13 @@ __END__
 
 =head1 NAME
 
-Test::Spy - Spy for Perl5
+Module::Spy - Spy for Perl5
 
 =head1 SYNOPSIS
 
 Spy for class method.
 
-    use Test::Spy;
+    use Module::Spy;
 
     my $spy = spy('LWP::UserAgent', 'request');
     $spy->returns(HTTP::Response->new(200));
@@ -163,7 +163,7 @@ Spy for class method.
 
 Spy for object method
 
-    use Test::Spy;
+    use Module::Spy;
 
     my $ua = LWP::UserAgent->new();
     my $spy = spy($ua, 'request')->returns(HTTP::Response->new(200));
@@ -174,7 +174,7 @@ Spy for object method
 
 =head1 DESCRIPTION
 
-Test::Spy is spy library for Perl5.
+Module::Spy is spy library for Perl5.
 
 =head1 FUNCTIONS
 
@@ -182,11 +182,11 @@ Test::Spy is spy library for Perl5.
 
 =item C<< my $spy = spy($class|$object, $method) >>
 
-Create new spy. Returns new Test::Spy::Class or Test::Spy::Object instance.
+Create new spy. Returns new Module::Spy::Class or Module::Spy::Object instance.
 
 =back
 
-=head1 Test::Spy::(Class|Object) methods
+=head1 Module::Spy::(Class|Object) methods
 
 =over 4
 
@@ -194,7 +194,7 @@ Create new spy. Returns new Test::Spy::Class or Test::Spy::Object instance.
 
 Returns true value if the method was called. False otherwise.
 
-=item C<< $spy->returns($value) : Test::Spy::Base >>
+=item C<< $spy->returns($value) : Module::Spy::Base >>
 
 Stub the method's return value as C<$value>.
 
