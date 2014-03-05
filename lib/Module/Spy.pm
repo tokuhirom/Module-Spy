@@ -3,7 +3,6 @@ use 5.008005;
 use strict;
 use warnings;
 use Scalar::Util ();
-use Class::Monadic;
 
 our $VERSION = "0.01";
 

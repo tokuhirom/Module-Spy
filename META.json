@@ -43,6 +43,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Scalar::Util" : "0",
+            "parent" : "0",
             "perl" : "5.008005"
          }
       },
@@ -55,13 +57,13 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/tokuhirom/Test-Spy/issues"
+         "web" : "https://github.com/tokuhirom/Module-Spy/issues"
       },
-      "homepage" : "https://github.com/tokuhirom/Test-Spy",
+      "homepage" : "https://github.com/tokuhirom/Module-Spy",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/tokuhirom/Test-Spy.git",
-         "web" : "https://github.com/tokuhirom/Test-Spy"
+         "url" : "git://github.com/tokuhirom/Module-Spy.git",
+         "web" : "https://github.com/tokuhirom/Module-Spy"
       }
    },
    "version" : "0.01"

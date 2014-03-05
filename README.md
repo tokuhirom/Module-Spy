@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tokuhirom/Test-Spy.png?branch=master)](https://travis-ci.org/tokuhirom/Test-Spy)
+[![Build Status](https://travis-ci.org/tokuhirom/Module-Spy.png?branch=master)](https://travis-ci.org/tokuhirom/Module-Spy)
 # NAME
 
 Module::Spy - Spy for Perl5
