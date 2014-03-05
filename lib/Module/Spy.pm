@@ -78,8 +78,8 @@ sub new {
         $self->{anon_class} = $klass;
         $self->{isa} = do { \@{"${klass}::ISA"} };
         unshift @{$self->{isa}}, ref($stuff);
-     #  *{"${klass}::${method}"} = $spy;
-     #  bless $stuff, $klass; # rebless
+        *{"${klass}::${method}"} = $spy;
+        bless $stuff, $klass; # rebless
     }
 
     return $self;
