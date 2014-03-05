@@ -73,7 +73,7 @@ sub new {
         no warnings 'redefine';
 
         $SINGLETON_ID++;
-        my $klass = "Module::Spy::Singleton::" . $SINGLETON_ID;
+        my $klass = "Module::Spy::__ANON__::" . $SINGLETON_ID;
         $self->{id} = $SINGLETON_ID;
         $self->{anon_class} = $klass;
         $self->{isa} = do { \@{"${klass}::ISA"} };
@@ -105,7 +105,7 @@ sub DESTROY {
 
     @{$self->{isa}} = ();
 
-    my $original_stash = get_stash("Module::Spy::Singleton");
+    my $original_stash = get_stash("Module::Spy::__ANON__");
     my $sclass_stashgv = delete $original_stash->{$self->{id} . '::'};
     %{$sclass_stashgv} = ();
 
