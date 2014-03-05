@@ -29,6 +29,10 @@ Spy for object method
 
 Module::Spy is spy library for Perl5.
 
+# STABILITY
+
+__This module is under development. I will change API without notice.__
+
 # FUNCTIONS
 
 - `my $spy = spy($class|$object, $method)`
