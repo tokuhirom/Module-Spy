@@ -8,9 +8,7 @@ our $VERSION = "0.02";
 
 use parent qw(Exporter);
 
-our @EXPORT = qw(spy_on spy);
-
-sub spy { goto \&spy_on }
+our @EXPORT = qw(spy_on);
 
 sub spy_on {
     my ($stuff, $method) = @_;
@@ -27,6 +25,13 @@ package Module::Spy::Base;
 sub stuff { shift->{stuff} }
 sub method { shift->{method} }
 
+sub calls_any         { @{shift->{spy}->calls_all(@_)} > 0 }
+sub calls_count       { 0+@{shift->{spy}->calls_all(@_)} }
+sub calls_all         { shift->{spy}->calls_all(@_) }
+sub calls_most_recent { shift->{spy}->calls_all(@_)->[-1] }
+sub calls_first       { shift->{spy}->calls_all(@_)->[0] }
+sub calls_reset       { shift->{spy}->calls_reset(@_) }
+
 sub called {
     my $self = shift;
     $self->{spy}->called;
@@ -38,23 +43,17 @@ sub and_call_through {
     return $self;
 }
 
-sub call_through { shift->and_call_through(@_) }
-
 sub and_call_fake {
     my ($self, $code) = @_;
     $self->{spy}->call_fake($code);
     return $self;
 }
 
-sub call_fake { shift->and_call_fake(@_) }
-
 sub and_returns {
     my $self = shift;
     $self->{spy}->returns(@_);
     return $self;
 }
-
-sub returns { shift->and_returns(@_) }
 
 package Module::Spy::Object;
 our @ISA=('Module::Spy::Base');
@@ -129,8 +128,7 @@ sub new {
 
     my $self = bless { stuff => $stuff, method => $method }, $class;
 
-    my $orig = $self->stuff->can($self->method)
-        or die "Missing $method";
+    my $orig = $self->stuff->can($self->method);
     $self->{orig} = $orig;
 
     my $spy = Module::Spy::Sub->new($orig);
@@ -151,9 +149,14 @@ sub DESTROY {
     my $method = $self->{method};
     my $orig = $self->{orig};
 
-    no strict 'refs';
-    no warnings 'redefine';
-    *{"${stuff}::${method}"} = $orig;
+    if (defined $orig) {
+        no strict 'refs';
+        no warnings 'redefine';
+        *{"${stuff}::${method}"} = $orig;
+    } else {
+        no strict 'refs';
+        delete ${"${stuff}::"}{${method}};
+    }
 
     undef $self->{spy};
 }
@@ -166,6 +169,7 @@ our %COUNTER;
 our %RETURNS;
 our %CALL_THROUGH;
 our %CALL_FAKE;
+our %ARGS;
 
 sub new {
     my ($class, $orig) = @_;
@@ -176,6 +180,7 @@ sub new {
     my $code_addr = refaddr($code);
     $body = sub {
         $COUNTER{$code_addr}++;
+        push @{$ARGS{$code_addr}}, [@_];
 
         if (my $fake = $CALL_FAKE{$code_addr}) {
             goto $fake;
@@ -191,6 +196,8 @@ sub new {
 
         return;
     };
+    $COUNTER{$code_addr} = 0;
+    $ARGS{$code_addr} = [];
 
     my $self = bless $code, $class;
     return $self;
@@ -204,11 +211,23 @@ sub DESTROY {
     delete $RETURNS{$code_addr};
     delete $CALL_FAKE{$code_addr};
     delete $CALL_THROUGH{$code_addr};
+    delete $ARGS{$code_addr};
 }
 
 sub called {
     my $self = shift;
     !!$COUNTER{refaddr($self)};
+}
+
+sub calls_all {
+    my $self = shift;
+    $ARGS{refaddr($self)};
+}
+
+sub calls_reset {
+    my $self = shift;
+    $COUNTER{refaddr($self)} = 0;
+    $ARGS{refaddr($self)} = [];
 }
 
 sub returns {
@@ -267,8 +286,6 @@ Module::Spy is spy library for Perl5.
 
 =item C<< my $spy = spy_on($class|$object, $method) >>
 
-=item C<< my $spy = spy($class|$object, $method) >>
-
 Create new spy. Returns new Module::Spy::Class or Module::Spy::Object instance.
 
 =back
@@ -291,7 +308,35 @@ Stub the method's return value as C<$value>.
 
 Returns C<<$spy>> itself for method chaining.
 
+=item C<< $spy->calls_any() : Bool >>
+
+Returns false if the spy has not been called at all, and then true once at least one call happens.
+
+=item C<< $spy->calls_count() : Int >>
+
+Returns the number of times the spy was called
+
+=item C<< $spy->calls_all() : Int >>
+
+Returns arguments passed all calls
+
+=item C<< $spy->calls_most_recent() : ArrayRef >>
+
+Returns arguments for the most recent call
+
+=item C<< $spy->calls_first() : ArrayRef >>
+
+Returns arguments for the first call
+
+=item C<< $spy->calls_reset() >>
+
+Clears all tracking for a spy
+
 =back
+
+=head1 SEE ALSO
+
+The interface was inspired from Jasmine library L<http://jasmine.github.io/>.
 
 =head1 LICENSE
 
