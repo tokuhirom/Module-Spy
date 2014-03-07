@@ -17,7 +17,7 @@ $|++;
 subtest 'Spy class method', sub {
     subtest 'Not called yet', sub {
         # Given set spy
-        my $spy = spy('X', 'y');
+        my $spy = spy_on('X', 'y');
 
         # Then, it's not called
         ok !$spy->called;
@@ -25,7 +25,7 @@ subtest 'Spy class method', sub {
 
     subtest 'Called', sub {
         # Given set spy
-        my $spy = spy('X', 'y');
+        my $spy = spy_on('X', 'y');
 
         # When call the method
         local $X::Y_CNT = 0;
@@ -39,7 +39,7 @@ subtest 'Spy class method', sub {
 
     subtest 'Call through', sub {
         # Given set spy
-        my $spy = spy('X', 'y')->call_through;
+        my $spy = spy_on('X', 'y')->and_call_through;
 
         # Then, return value is original's
         local $X::Y_CNT = 0;
@@ -55,7 +55,7 @@ subtest 'Spy class method', sub {
         my $called;
 
         # Given set spy
-        my $spy = spy('X', 'y')->call_fake(sub { $called++; 5963 });
+        my $spy = spy_on('X', 'y')->and_call_fake(sub { $called++; 5963 });
 
         # Then, return value is undef
         local $X::Y_CNT = 0;
@@ -74,7 +74,7 @@ subtest 'Spy class method', sub {
     subtest 'Restored', sub {
         {
             # Given set spy
-            my $spy = spy('X', 'y');
+            my $spy = spy_on('X', 'y');
         }
 
         # When it's out-scoped
@@ -85,10 +85,10 @@ subtest 'Spy class method', sub {
 
     subtest 'Stub-out by value', sub {
         # Given set spy
-        my $spy = spy('X', 'y');
+        my $spy = spy_on('X', 'y');
 
         # When set return value as 3
-        is refaddr($spy->returns(3)), refaddr($spy);
+        is refaddr($spy->and_returns(3)), refaddr($spy);
 
         # Then return value is 3
         is(X->y, 3);
@@ -101,7 +101,7 @@ subtest 'Spy instance method', sub {
         my $obj = X->new;
 
         # Given set spy
-        my $spy = spy($obj, 'y');
+        my $spy = spy_on($obj, 'y');
 
         # Then, it's not called
         ok !$spy->called;
@@ -112,7 +112,7 @@ subtest 'Spy instance method', sub {
         my $obj = X->new;
 
         # Given set spy
-        my $spy = spy($obj, 'y');
+        my $spy = spy_on($obj, 'y');
 
         # When call the method
         local $X::Y_CNT = 0;
@@ -130,7 +130,7 @@ subtest 'Spy instance method', sub {
         my $obj = X->new;
 
         # Given set spy
-        my $spy = spy($obj, 'y')->call_through;
+        my $spy = spy_on($obj, 'y')->and_call_through;
 
         # Then, return value is 'yyy'
         local $X::Y_CNT = 0;
@@ -149,7 +149,7 @@ subtest 'Spy instance method', sub {
 
         # Given set spy
         my $called = 0;
-        my $spy = spy($obj, 'y')->call_fake(sub {
+        my $spy = spy_on($obj, 'y')->and_call_fake(sub {
             $called++; 4649;
         });
 
@@ -171,7 +171,7 @@ subtest 'Spy instance method', sub {
 
         {
             # When, set spy
-            my $spy = spy($obj, 'y');
+            my $spy = spy_on($obj, 'y');
 
             # Then, it's spy-ed.
             is $obj->y, undef;
@@ -192,7 +192,7 @@ subtest 'Spy instance method', sub {
         my $another_obj = X->new;
 
         # Given set spy
-        my $spy = spy($obj, 'y');
+        my $spy = spy_on($obj, 'y');
 
         # Then, $obj was spyed
         is ref($obj->can('y')), 'Module::Spy::Sub';

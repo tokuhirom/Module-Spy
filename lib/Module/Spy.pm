@@ -8,9 +8,11 @@ our $VERSION = "0.02";
 
 use parent qw(Exporter);
 
-our @EXPORT = qw(spy);
+our @EXPORT = qw(spy_on spy);
 
-sub spy {
+sub spy { goto \&spy_on }
+
+sub spy_on {
     my ($stuff, $method) = @_;
 
     if (Scalar::Util::blessed($stuff)) {
@@ -30,23 +32,29 @@ sub called {
     $self->{spy}->called;
 }
 
-sub call_through {
+sub and_call_through {
     my $self = shift;
     $self->{spy}->call_through;
     return $self;
 }
 
-sub call_fake {
+sub call_through { shift->and_call_through(@_) }
+
+sub and_call_fake {
     my ($self, $code) = @_;
     $self->{spy}->call_fake($code);
     return $self;
 }
 
-sub returns {
+sub call_fake { shift->and_call_fake(@_) }
+
+sub and_returns {
     my $self = shift;
     $self->{spy}->returns(@_);
     return $self;
 }
+
+sub returns { shift->and_returns(@_) }
 
 package Module::Spy::Object;
 our @ISA=('Module::Spy::Base');
@@ -233,8 +241,8 @@ Spy for class method.
 
     use Module::Spy;
 
-    my $spy = spy('LWP::UserAgent', 'request');
-    $spy->returns(HTTP::Response->new(200));
+    my $spy = spy_on('LWP::UserAgent', 'request');
+    $spy->and_returns(HTTP::Response->new(200));
 
     my $res = LWP::UserAgent->new()->get('http://mixi.jp/');
 
@@ -243,7 +251,7 @@ Spy for object method
     use Module::Spy;
 
     my $ua = LWP::UserAgent->new();
-    my $spy = spy($ua, 'request')->returns(HTTP::Response->new(200));
+    my $spy = spy_on($ua, 'request')->and_returns(HTTP::Response->new(200));
 
     my $res = $ua->get('http://mixi.jp/');
 
@@ -253,13 +261,11 @@ Spy for object method
 
 Module::Spy is spy library for Perl5.
 
-=head1 STABILITY
-
-B<This module is under development. I will change API without notice.>
-
 =head1 FUNCTIONS
 
 =over 4
+
+=item C<< my $spy = spy_on($class|$object, $method) >>
 
 =item C<< my $spy = spy($class|$object, $method) >>
 
@@ -273,9 +279,13 @@ Create new spy. Returns new Module::Spy::Class or Module::Spy::Object instance.
 
 =item C<< $spy->called() :Bool >>
 
+=item C<< $spy->and_called() :Bool >>
+
 Returns true value if the method was called. False otherwise.
 
 =item C<< $spy->returns($value) : Module::Spy::Base >>
+
+=item C<< $spy->and_returns($value) : Module::Spy::Base >>
 
 Stub the method's return value as C<$value>.
 
