@@ -47,7 +47,7 @@ Module::Spy is spy library for Perl5.
 
     Stub the method's return value as `$value`.
 
-    Returns `<$spy`\> itself for method chaining.
+    Returns `<$spy`> itself for method chaining.
 
 - `$spy->calls_any() : Bool`
 

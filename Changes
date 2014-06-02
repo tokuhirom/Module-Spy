@@ -2,6 +2,10 @@ Revision history for Perl extension Test-Spy
 
 {{$NEXT}}
 
+0.04 2014-06-02T23:18:25Z
+
+    - Added missing `returns` method.
+
 0.03 2014-03-07T03:49:13Z
 
     [INCOMPATIBLE CHANGES]
