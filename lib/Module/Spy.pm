@@ -54,6 +54,7 @@ sub and_returns {
     $self->{spy}->returns(@_);
     return $self;
 }
+sub returns { shift->and_returns(@_) }
 
 package Module::Spy::Object;
 our @ISA=('Module::Spy::Base');
