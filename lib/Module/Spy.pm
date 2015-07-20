@@ -188,10 +188,7 @@ sub new {
         }
 
         if (exists $RETURNS{$code_addr}) {
-            if (@{$RETURNS{$code_addr}} == 1) {
-                return $RETURNS{$code_addr}->[0];
-            }
-            return @{$RETURNS{$code_addr}};
+            return $RETURNS{$code_addr};
         }
 
         if ($CALL_THROUGH{$code_addr}) {
@@ -235,8 +232,8 @@ sub calls_reset {
 }
 
 sub returns {
-    my $self = shift;
-    $RETURNS{refaddr($self)} = \@_;
+    my ($self, $value) = @_;
+    $RETURNS{refaddr($self)} = $value;
 }
 
 sub call_through {

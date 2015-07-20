@@ -93,19 +93,6 @@ subtest 'Spy class method', sub {
         # Then return value is 3
         is(X->y, 3);
     };
-
-    subtest 'Stub-out by array value', sub {
-        # Given set spy
-        my $spy = spy_on('X', 'y');
-
-        # When set return value as (3, 5)
-        is refaddr($spy->and_returns(3, 5)), refaddr($spy);
-
-        # Then return value is (3, 5)
-        my @ret = X->y;
-        is($ret[0], 3);
-        is($ret[1], 5);
-    };
 };
 
 subtest 'Spy instance method', sub {
