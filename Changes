@@ -2,6 +2,11 @@ Revision history for Perl extension Test-Spy
 
 {{$NEXT}}
 
+0.05 2015-07-20T10:29:55Z
+
+    - Support array return value in `and_returns` method.
+      (pine613)
+
 0.04 2014-06-02T23:18:25Z
 
     - Added missing `returns` method.
