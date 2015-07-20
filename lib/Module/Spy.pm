@@ -236,7 +236,7 @@ sub calls_reset {
 
 sub returns {
     my $self = shift;
-    $RETURNS{refaddr($self)} = \@_;
+    $RETURNS{refaddr($self)} = [@_];
 }
 
 sub call_through {
