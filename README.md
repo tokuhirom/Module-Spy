@@ -49,6 +49,12 @@ Module::Spy is spy library for Perl5.
 
     Returns `<$spy`> itself for method chaining.
 
+- `$spy->and_call_through() : Module::Spy::Base`
+
+    Do not stub the method's return value, calls original implementation.
+
+    Returns `<$spy`> itself for method chaining.
+
 - `$spy->calls_any() : Bool`
 
     Returns false if the spy has not been called at all, and then true once at least one call happens.
@@ -57,7 +63,7 @@ Module::Spy is spy library for Perl5.
 
     Returns the number of times the spy was called
 
-- `$spy->calls_all() : Int`
+- `$spy->calls_all() : ArrayRef`
 
     Returns arguments passed all calls
 
