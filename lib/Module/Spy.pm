@@ -312,6 +312,12 @@ Stub the method's return value as C<$value>.
 
 Returns C<<$spy>> itself for method chaining.
 
+=item C<< $spy->and_call_through() : Module::Spy::Base >>
+
+Do not stub the method's return value, calls original implementation.
+
+Returns C<<$spy>> itself for method chaining.
+
 =item C<< $spy->calls_any() : Bool >>
 
 Returns false if the spy has not been called at all, and then true once at least one call happens.
@@ -320,7 +326,7 @@ Returns false if the spy has not been called at all, and then true once at least
 
 Returns the number of times the spy was called
 
-=item C<< $spy->calls_all() : Int >>
+=item C<< $spy->calls_all() : ArrayRef >>
 
 Returns arguments passed all calls
 
