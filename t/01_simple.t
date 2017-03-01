@@ -5,14 +5,23 @@ use Test::More;
 use Module::Spy;
 use Scalar::Util qw(refaddr);
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use X;
+
 $|++;
 
-{
-    package X;
-    our $Y_CNT = 0;
-    sub new { bless {}, shift }
-    sub y { $Y_CNT++; 'yyy' }
-}
+subtest 'Spy class method (not required yet)' => sub {
+    my $last_warning;
+    local $SIG{__WARN__} = sub { $last_warning = $_[0] };
+
+    ok ! exists $INC{'Truman.pm'};
+
+    my $spy = spy_on('Truman', 'name');
+    require Truman;
+
+    is $last_warning, undef;
+};
 
 subtest 'Spy class method', sub {
     subtest 'Not called yet', sub {

@@ -123,9 +123,12 @@ sub DESTROY {
 package Module::Spy::Class;
 our @ISA=('Module::Spy::Base');
 
+use Class::Load qw(load_class);
+
 sub new {
     my $class = shift;
     my ($stuff, $method) = @_;
+    load_class($stuff); # $stuff is a class in Module::Spy::Class
 
     my $self = bless { stuff => $stuff, method => $method }, $class;
 
