@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Scalar::Util ();
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use parent qw(Exporter);
 
