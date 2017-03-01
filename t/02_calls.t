@@ -4,6 +4,10 @@ use utf8;
 use Test::More;
 use Module::Spy;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use X;
+
 subtest 'calls_any', sub {
     my $spy = spy_on('X', 'y');
     ok !$spy->calls_any;

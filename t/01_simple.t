@@ -5,14 +5,12 @@ use Test::More;
 use Module::Spy;
 use Scalar::Util qw(refaddr);
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use X;
+
 $|++;
 
-{
-    package X;
-    our $Y_CNT = 0;
-    sub new { bless {}, shift }
-    sub y { $Y_CNT++; 'yyy' }
-}
 
 subtest 'Spy class method', sub {
     subtest 'Not called yet', sub {
