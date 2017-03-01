@@ -11,6 +11,17 @@ use X;
 
 $|++;
 
+subtest 'Spy class method (not required yet)' => sub {
+    my $last_warning;
+    local $SIG{__WARN__} = sub { $last_warning = $_[0] };
+
+    ok ! exists $INC{'Truman.pm'};
+
+    my $spy = spy_on('Truman', 'name');
+    require Truman;
+
+    is $last_warning, undef;
+};
 
 subtest 'Spy class method', sub {
     subtest 'Not called yet', sub {
